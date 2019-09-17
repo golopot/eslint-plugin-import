@@ -1,4 +1,6 @@
 import {RuleTester} from 'eslint'
+import {testFilePath} from '../utils'
+
 import rule from '../../../src/rules/default-import-match-filename' // eslint-disable-line import/default
 
 const ruleTester = new RuleTester({
@@ -12,14 +14,20 @@ function getMessage(filename) {
   return `Default import name does not match filename "${filename}".`
 }
 
-function fail(code, filename) {
+/**
+ * @param {string} code
+ * @param {string} expectedFilename
+ * @param {string} [filename]
+ */
+function fail(code, expectedFilename, filename) {
   return {
     code,
     errors: [
       {
-        message: getMessage(filename),
+        message: getMessage(expectedFilename),
       },
     ],
+    filename,
   }
 }
 
@@ -46,26 +54,41 @@ ruleTester.run('default-import-match-filename', rule, {
     'import loud_cat from "./loud_cat"',
     'import catModel from "./cat.model"',
     'import catModel from "./cat.model.js"',
-    'import doge from "."',
-    'import doge from "./"',
-    'import doge from "./.."',
-    'import doge from "./../"',
-    'import doge from ".."',
-    'import doge from "../"',
-    'import doge from "../.."',
     'import doge from "cat"',
     'import doge from "loud-cat"',
     'import doge from ".cat"',
     'import doge from ""',
+    'import doge from "../index"',
     'import {doge} from "./cat"',
     'import cat, {doge} from "./cat"',
-    'const cat = require("..")',
     'const cat = require("./cat")',
     'const cat = require("../cat")',
     'const cat = require("./cat/index")',
     'const cat = require("./cat/index.js")',
     'const doge = require("cat")',
     'const {f, g} = require("./cat")',
+    {
+      code: `
+        import someDirectory from ".";
+        import someDirectory_ from "./";
+        const someDirectory__ = require('.');
+      `,
+      filename: testFilePath(
+        'default-import-match-filename/some-directory/a.js'
+      ),
+    },
+    {
+      code: `
+        import packageName from "..";
+        import packageName_ from "../";
+        import packageName__ from "./..";
+        import packageName___ from "./../";
+        const packageName____ = require('..');
+      `,
+      filename: testFilePath(
+        'default-import-match-filename/some-directory/a.js'
+      ),
+    },
   ],
   invalid: [
     fail('import cat0 from "./cat"', 'cat'),
@@ -85,5 +108,15 @@ ruleTester.run('default-import-match-filename', rule, {
     fail('const doge = require("./cat/index")', 'cat'),
     fail('const doge = require("./cat/index.js")', 'cat'),
     fail('const doge = require("../models/cat")', 'cat'),
+    fail(
+      'import nope from "."',
+      'some-directory',
+      testFilePath('default-import-match-filename/some-directory/a.js')
+    ),
+    fail(
+      'import nope from ".."',
+      'package-name',
+      testFilePath('default-import-match-filename/some-directory/a.js')
+    ),
   ],
 })

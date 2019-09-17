@@ -1,6 +1,7 @@
 import docsUrl from '../docsUrl'
 import isStaticRequire from '../core/staticRequire'
 import Path from 'path'
+import fs from 'fs'
 
 /**
  * @param {string} filename
@@ -43,19 +44,62 @@ function isBarePackageImport(path) {
 }
 
 /**
- * Get filename from a path.
+ * Match paths consisting of only '.' and '..', like '.', './', '..', '../..'.
  * @param {string} path
+ * @returns {boolean}
+ */
+function isAncestorRelativePath(path) {
+  return (
+    path.length > 0 &&
+    path[0] !== '/' &&
+    path
+      .split('/')
+      .every(segment => segment === '..' || segment === '.' || segment === '')
+  )
+}
+
+/**
+ * @param {string} packageJsonPath
  * @returns {string | undefined}
  */
-function getFilename(path) {
+function getPackageJsonName(packageJsonPath) {
+  try {
+    const packageJsonContent = fs.readFileSync(packageJsonPath).toString()
+    const packageJson = JSON.parse(packageJsonContent)
+    return packageJson.name || undefined
+  } catch (_) {
+    return undefined
+  }
+}
+
+function getNameFromPackageJsonOrDirname(path, context) {
+  const directoryName = Path.join(context.getFilename(), path, '..')
+  const packageJsonPath = Path.join(directoryName, 'package.json')
+  const packageJsonName = getPackageJsonName(packageJsonPath)
+  return packageJsonName || Path.basename(directoryName)
+}
+
+/**
+ * Get filename from a path.
+ * @param {string} path
+ * @param {object} context
+ * @returns {string | undefined}
+ */
+function getFilename(path, context) {
+  // like require('lodash')
   if (isBarePackageImport(path)) {
     return undefined
+  }
+
+  // like require('.'), require('..'), require('../..')
+  if (isAncestorRelativePath(path)) {
+    return getNameFromPackageJsonOrDirname(path, context)
   }
 
   const basename = Path.basename(path)
 
   const filename = /^index$|^index\./.test(basename)
-    ? Path.basename(Path.join(path, '..'))
+    ? Path.basename(Path.dirname(path))
     : basename
 
   if (filename === '' || filename === '.' || filename === '..') {
@@ -86,7 +130,7 @@ module.exports = {
           return
         }
 
-        const filename = getFilename(node.source.value)
+        const filename = getFilename(node.source.value, context)
 
         if (!filename) {
           return
@@ -111,7 +155,7 @@ module.exports = {
 
         const localName = node.parent.id.name
 
-        const filename = getFilename(node.arguments[0].value)
+        const filename = getFilename(node.arguments[0].value, context)
 
         if (!filename) {
           return
