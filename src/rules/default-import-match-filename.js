@@ -1,6 +1,6 @@
 import docsUrl from '../docsUrl'
 import isStaticRequire from '../core/staticRequire'
-import Path  from 'path'
+import Path from 'path'
 
 /**
  * @param {string} filename
@@ -34,12 +34,12 @@ function isCompatible(localName, filename) {
 }
 
 /**
- * Test if path starts with "./" or "../".
+ * Match 'foo' but not 'foo/bar.js' and './foo'
  * @param {string} path
  * @returns {boolean}
  */
-function isLocalModule(path) {
-  return /^(\.\/|\.\.\/)/.test(path)
+function isBarePackageImport(path) {
+  return path !== '.' && path !== '..' && !path.includes('/')
 }
 
 /**
@@ -48,7 +48,10 @@ function isLocalModule(path) {
  * @returns {string | undefined}
  */
 function getFilename(path) {
-  if (!isLocalModule(path)) return undefined
+  if (isBarePackageImport(path)) {
+    return undefined
+  }
+
   const basename = Path.basename(path)
 
   const filename = /^index$|^index\./.test(basename)

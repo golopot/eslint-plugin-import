@@ -10,6 +10,8 @@ Enforces default import name to match filename. Name matching is case-insensitiv
 import notFoo from './foo';
 import utilsFoo from '../utils/foo';
 import notFoo from '../foo/index.js';
+import foo from '../foo/index.js';
+import notMerge from 'lodash/merge';
 const bar = require('./foo');
 const bar = require('../foo');
 ```
@@ -19,6 +21,8 @@ const bar = require('../foo');
 ```js
 import foo from './foo';
 import foo from '../foo/index.js';
+import merge from 'lodash/merge';
+import anything from 'foo';
 import foo_ from './foo';
 import foo from './foo.js';
 import fooBar from './foo-bar';
