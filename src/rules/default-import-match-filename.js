@@ -1,6 +1,6 @@
 import docsUrl from '../docsUrl'
 import isStaticRequire from '../core/staticRequire'
-import Path from 'path'
+import Path  from 'path'
 
 /**
  * @param {string} filename
@@ -49,7 +49,12 @@ function isLocalModule(path) {
  */
 function getFilename(path) {
   if (!isLocalModule(path)) return undefined
-  const [, filename] = /\/([^/]*)$/.exec(path)
+  const basename = Path.basename(path)
+
+  const filename = /^index$|^index\./.test(basename)
+    ? Path.basename(Path.join(path, '..'))
+    : basename
+
   if (filename === '' || filename === '.' || filename === '..') {
     return undefined
   }
