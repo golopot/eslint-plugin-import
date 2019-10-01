@@ -108,15 +108,42 @@ function getFilename(path, context) {
   return filename
 }
 
+/**
+ * @param {string[]} ignorePaths
+ * @param {string} path
+ * @returns {boolean}
+ */
+function isIgnored(ignorePaths, path) {
+  return ignorePaths.some(pattern => path.includes(pattern))
+}
+
 module.exports = {
   meta: {
     type: 'suggestion',
     docs: {
       url: docsUrl('default-import-match-filename'),
     },
+    schema: [
+      {
+        type: 'object',
+        additionalProperties: false,
+        properties: {
+          ignorePaths: {
+            type: 'array',
+            items: {
+              type: 'string',
+            },
+          },
+        },
+      },
+    ],
   },
 
   create(context) {
+    const ignorePaths = context.options[0]
+      ? context.options[0].ignorePaths || []
+      : []
+
     return {
       ImportDeclaration(node) {
         const defaultImportSpecifier = node.specifiers.find(
@@ -136,7 +163,10 @@ module.exports = {
           return
         }
 
-        if (!isCompatible(defaultImportName, filename)) {
+        if (
+          !isCompatible(defaultImportName, filename) &&
+          !isIgnored(ignorePaths, node.source.value)
+        ) {
           context.report({
             node: defaultImportSpecifier,
             message: `Default import name does not match filename "${filename}".`,
@@ -161,7 +191,10 @@ module.exports = {
           return
         }
 
-        if (!isCompatible(localName, filename)) {
+        if (
+          !isCompatible(localName, filename) &&
+          !isIgnored(ignorePaths, node.arguments[0].value)
+        ) {
           context.report({
             node: node.parent.id,
             message: `Default import name does not match filename "${filename}".`,

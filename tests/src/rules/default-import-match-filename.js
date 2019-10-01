@@ -69,6 +69,13 @@ ruleTester.run('default-import-match-filename', rule, {
     'const {f, g} = require("./cat")',
     {
       code: `
+        import QWER from './ignore-dir/a';
+        import WRYYY from '../models/mmm';
+      `,
+      options: [{ignorePaths: ['ignore-dir/', 'mmm']}],
+    },
+    {
+      code: `
         import someDirectory from ".";
         import someDirectory_ from "./";
         const someDirectory__ = require('.');
@@ -118,5 +125,10 @@ ruleTester.run('default-import-match-filename', rule, {
       'package-name',
       testFilePath('default-import-match-filename/some-directory/a.js')
     ),
+    {
+      code: `import QWERTY from '../bbb/ccc';`,
+      options: [{ignorePaths: ['aaa']}],
+      errors: [{message: getMessage('ccc')}],
+    },
   ],
 })

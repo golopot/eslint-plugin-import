@@ -4,6 +4,12 @@ Enforces default import name to match filename. Name matching is case-insensitiv
 
 ## Rule Details
 
+### Options
+
+#### `ignorePaths`
+
+Set this option to `['some-dir/', 'bb']` to ignore import statements whose path contains either `some-dir/` or `bb` as a substring.
+
 ### Fail
 
 ```js
@@ -33,4 +39,7 @@ import fooBar from './foo-bar';
 import FoObAr from './foo-bar';
 import catModel from './cat.model.js';
 const foo = require('./foo');
+
+// Option `{ ignorePaths: ['format/'] }`
+import QWERTY from '../format/date';
 ```
