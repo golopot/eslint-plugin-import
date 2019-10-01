@@ -16,7 +16,6 @@ Set this option to `['some-dir/', 'bb']` to ignore import statements whose path 
 import notFoo from './foo';
 import utilsFoo from '../utils/foo';
 import notFoo from '../foo/index.js';
-import foo from '../foo/index.js';
 import notMerge from 'lodash/merge';
 import notPackageName from '..'; // When "../package.json" has name "package-name"
 import notDirectoryName from '..'; // When ".." is a directory named "directory-name"
