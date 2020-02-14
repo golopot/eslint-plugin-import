@@ -51,7 +51,7 @@ function isBarePackageImport(path) {
 function isAncestorRelativePath(path) {
   return (
     path.length > 0 &&
-    path[0] !== '/' &&
+    !path.startsWith('/') &&
     path
       .split('/')
       .every(segment => segment === '..' || segment === '.' || segment === '')
