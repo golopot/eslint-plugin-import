@@ -64,7 +64,7 @@ function isAncestorRelativePath(path) {
  */
 function getPackageJsonName(packageJsonPath) {
   try {
-    const packageJsonContent = fs.readFileSync(packageJsonPath).toString()
+    const packageJsonContent = String(fs.readFileSync(packageJsonPath))
     const packageJson = JSON.parse(packageJsonContent)
     return packageJson.name || undefined
   } catch (_) {
