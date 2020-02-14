@@ -80,7 +80,7 @@ ruleTester.run('default-import-match-filename', rule, {
         const someDirectory__ = require('.');
       `,
       filename: testFilePath(
-        'default-import-match-filename/some-directory/a.js'
+        'default-import-match-filename/some-directory/a.js',
       ),
     },
     {
@@ -92,7 +92,7 @@ ruleTester.run('default-import-match-filename', rule, {
         const packageName____ = require('..');
       `,
       filename: testFilePath(
-        'default-import-match-filename/some-directory/a.js'
+        'default-import-match-filename/some-directory/a.js',
       ),
     },
     {
@@ -121,17 +121,17 @@ ruleTester.run('default-import-match-filename', rule, {
     fail(
       'import nope from "."',
       'some-directory',
-      testFilePath('default-import-match-filename/some-directory/a.js')
+      testFilePath('default-import-match-filename/some-directory/a.js'),
     ),
     fail(
       'import nope from ".."',
       'package-name',
-      testFilePath('default-import-match-filename/some-directory/a.js')
+      testFilePath('default-import-match-filename/some-directory/a.js'),
     ),
     fail(
       'import nope from "../../index.js"',
       'package-name',
-      testFilePath('default-import-match-filename/some-directory/foo/a.js')
+      testFilePath('default-import-match-filename/some-directory/foo/a.js'),
     ),
     {
       code: `import QWERTY from '../bbb/ccc';`,
