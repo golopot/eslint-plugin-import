@@ -135,7 +135,7 @@ ruleTester.run('default-import-match-filename', rule, {
     ),
     {
       code: `import QWERTY from '../bbb/ccc';`,
-      output: undefined,
+      output: `import QWERTY from '../bbb/ccc';`,
       options: [{ignorePaths: ['aaa']}],
       errors: [{message: getMessage('ccc')}],
     },
