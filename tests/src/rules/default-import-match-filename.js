@@ -58,7 +58,6 @@ ruleTester.run('default-import-match-filename', rule, {
     'import doge from "loud-cat"',
     'import doge from ".cat"',
     'import doge from ""',
-    'import doge from "../index"',
     'import {doge} from "./cat"',
     'import cat, {doge} from "./cat"',
     'const cat = require("./cat")',
@@ -96,6 +95,10 @@ ruleTester.run('default-import-match-filename', rule, {
         'default-import-match-filename/some-directory/a.js'
       ),
     },
+    {
+      code: 'import doge from "../index.js"',
+      filename: 'doge/a/a.js',
+    },
   ],
   invalid: [
     fail('import cat0 from "./cat"', 'cat'),
@@ -124,6 +127,11 @@ ruleTester.run('default-import-match-filename', rule, {
       'import nope from ".."',
       'package-name',
       testFilePath('default-import-match-filename/some-directory/a.js')
+    ),
+    fail(
+      'import nope from "../../index.js"',
+      'package-name',
+      testFilePath('default-import-match-filename/some-directory/foo/a.js')
     ),
     {
       code: `import QWERTY from '../bbb/ccc';`,

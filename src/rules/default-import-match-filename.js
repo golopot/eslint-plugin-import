@@ -91,21 +91,18 @@ function getFilename(path, context) {
     return undefined
   }
 
-  // like require('.'), require('..'), require('../..')
-  if (isAncestorRelativePath(path)) {
-    return getNameFromPackageJsonOrDirname(path, context)
-  }
-
   const basename = Path.basename(path)
 
-  const filename = /^index$|^index\./.test(basename)
-    ? Path.basename(Path.dirname(path))
-    : basename
+  const processedPath = /^index$|^index\./.test(basename)
+    ? Path.dirname(path)
+    : path
 
-  if (filename === '' || filename === '.' || filename === '..') {
-    return undefined
+  // like require('.'), require('..'), require('../..')
+  if (isAncestorRelativePath(processedPath)) {
+    return getNameFromPackageJsonOrDirname(processedPath, context)
   }
-  return filename
+
+  return Path.basename(processedPath)
 }
 
 /**
