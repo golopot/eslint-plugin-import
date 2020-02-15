@@ -31,6 +31,11 @@ function fail(code, expectedFilename, filename) {
   }
 }
 
+const parserOptions = {
+  ecmaVersion: 6,
+  sourceType: 'module',
+}
+
 ruleTester.run('default-import-match-filename', rule, {
   valid: [
     'import Cat from "./cat"',
@@ -100,6 +105,119 @@ ruleTester.run('default-import-match-filename', rule, {
       code: 'import doge from "../index.js"',
       filename: 'doge/a/a.js',
     },
+    {
+      filename: 'JordanHarband.js',
+      parserOptions,
+      code: 'export default JordanHarband;',
+    },
+    {
+      filename: 'JordanHarband.js',
+      parserOptions,
+      code: 'export default function () {}',
+    },
+    {
+      filename: 'JordanHarband.jsx',
+      parserOptions,
+      code: 'export default JordanHarband;',
+    },
+    {
+      filename: '/some/path/to/JordanHarband.js',
+      parserOptions,
+      code: 'export default JordanHarband;',
+    },
+    {
+      filename: '/another/path/to/JordanHarband.jsx',
+      parserOptions,
+      code: 'export default JordanHarband;',
+    },
+    {
+      filename: '/another/path/to/jordanHarband.js',
+      parserOptions,
+      code: 'export default jordanHarband;',
+    },
+    {
+      filename: '/another/path/to/jordanHarband.js',
+      parserOptions,
+      code: 'export default function jordanHarband(){};',
+    },
+    {
+      filename: '/another/path/to/JordanHarband.jsx',
+      parserOptions,
+      code: 'export default class JordanHarband {}',
+    },
+    {
+      filename: 'JordanHarband.jsx',
+      parserOptions,
+      code: 'export default class JordanHarband {}',
+    },
+    {
+      filename: 'JordanHarband.js',
+      parserOptions,
+      code: 'export default class JordanHarband {}',
+    },
+    {
+      filename: 'JordanHarband.jsx',
+      parserOptions,
+      code: 'export default function JordanHarband() {}',
+    },
+    {
+      filename: 'JordanHarband.js',
+      parserOptions,
+      code: 'export default function JordanHarband() {}',
+    },
+    {
+      filename: '/path/to/JordanHarband/index.jsx',
+      parserOptions,
+      code: 'export default class JordanHarband {}',
+    },
+    {
+      filename: 'TaeKim.ts',
+      parserOptions,
+      code: 'export default TaeKim;',
+      settings: {
+        'import/extensions': ['.ts'],
+      },
+    },
+    {
+      filename: 'TaeKim.tsx',
+      parserOptions,
+      code: 'export default TaeKim;',
+      settings: {
+        'import/extensions': ['.tsx'],
+      },
+    },
+    {
+      filename: 'TaeKim.js',
+      parserOptions,
+      code: 'export default TaeKim;',
+      settings: {
+        'import/extensions': ['.js', '.jsx', '.ts', '.tsx'],
+      },
+    },
+    {
+      filename: 'TaeKim.jsx',
+      parserOptions,
+      code: 'export default TaeKim;',
+      settings: {
+        'import/extensions': ['.js', '.jsx', '.ts', '.tsx'],
+      },
+    },
+    {
+      filename: 'TaeKim.ts',
+      parserOptions,
+      code: 'export default TaeKim;',
+      settings: {
+        'import/extensions': ['.js', '.jsx', '.ts', '.tsx'],
+      },
+    },
+    {
+      filename: 'TaeKim.tsx',
+      parserOptions,
+      code: 'export default TaeKim;',
+      settings: {
+        'import/extensions': ['.js', '.jsx', '.ts', '.tsx'],
+      },
+    },
   ],
   invalid: [
     fail('import cat0 from "./cat"', 'cat'),
@@ -139,6 +257,152 @@ ruleTester.run('default-import-match-filename', rule, {
       output: `import QWERTY from '../bbb/ccc';`,
       options: [{ignorePaths: ['aaa']}],
       errors: [{message: getMessage('ccc')}],
+    },
+    {
+      filename: 'NotJordanHarband.js',
+      code: 'export default JordanHarband;',
+      output: 'export default JordanHarband;',
+      parserOptions,
+      errors: [{
+        message: getMessage('JordanHarband'),
+        type: 'Identifier',
+      }],
+    },
+    {
+      filename: 'NotJordanHarband.jsx',
+      code: 'export default JordanHarband;',
+      output: 'export default JordanHarband;',
+      parserOptions,
+      errors: [{
+        message: getMessage('JordanHarband'),
+        type: 'Identifier',
+      }],
+    },
+    {
+      filename: 'path/to/something/NotJordanHarband.jsx',
+      code: 'export default JordanHarband;',
+      output: 'export default JordanHarband;',
+      parserOptions,
+      errors: [{
+        message: getMessage('JordanHarband'),
+        type: 'Identifier',
+      }],
+    },
+    {
+      filename: 'path/to/something/NotJordanHarband.jsx',
+      code: 'export default class JordanHarband {}',
+      output: 'export default class JordanHarband {}',
+      parserOptions,
+      errors: [{
+        message: getMessage('JordanHarband'),
+        type: 'ClassDeclaration',
+      }],
+    },
+    {
+      filename: 'path/to/something/NotJordanHarband.jsx',
+      code: 'export default function JordanHarband () {}',
+      output: 'export default function JordanHarband () {}',
+      parserOptions,
+      errors: [{
+        message: getMessage('JordanHarband'),
+        type: 'FunctionDeclaration',
+      }],
+    },
+    {
+      filename: 'path/to/something/JoRdAnHaRbAnD.jsx',
+      code: 'export default function jordanHarband () {}',
+      output: 'export default function jordanHarband () {}',
+      parserOptions,
+      errors: [{
+        message: getMessage('JordanHarband'),
+        type: 'FunctionDeclaration',
+      }],
+    },
+    {
+      filename: 'index.js',
+      parserOptions,
+      code: 'export default class JordanHarband {}',
+      output: 'export default class JordanHarband {}',
+      errors: [{
+        message: getMessage('JordanHarband'),
+        type: 'ClassDeclaration',
+      }],
+    },
+    {
+      filename: 'NotJordanHarband/index.js',
+      parserOptions,
+      code: 'export default class JordanHarband {}',
+      output: 'export default class JordanHarband {}',
+      errors: [{
+        message: getMessage('JordanHarband'),
+        type: 'ClassDeclaration',
+      }],
+    },
+    {
+      filename: 'JordanHarband/foobar.js',
+      parserOptions,
+      code: 'export default class JordanHarband {}',
+      output: 'export default class JordanHarband {}',
+      errors: [{
+        message: getMessage('JordanHarband'),
+        type: 'ClassDeclaration',
+      }],
+    },
+    {
+      filename: 'path/to/JoRdAnHaRbAnD/index.js',
+      parserOptions,
+      code: 'export default class JordanHarband {}',
+      output: 'export default class JordanHarband {}',
+      errors: [{
+        message: getMessage('JordanHarband'),
+        type: 'ClassDeclaration',
+      }],
+    },
+    {
+      filename: 'path/to/Jo_RdAnH_aRbAnD/index.js',
+      parserOptions,
+      code: 'export default class JordanHarband {}',
+      output: 'export default class JordanHarband {}',
+      errors: [{
+        message: getMessage('JordanHarband'),
+        type: 'ClassDeclaration',
+      }],
+    },
+    {
+      filename: '/path/to/JordanHarbandReducer.js',
+      parserOptions,
+      code: 'export default function jordanHarband() {}',
+      output: 'export default function jordanHarband() {}',
+      errors: [{
+        message: getMessage('JordanHarband'),
+        type: 'FunctionDeclaration',
+      }],
+    },
+    {
+      filename: 'NotTaeKim.ts',
+      code: 'export default TaeKim;',
+      output: 'export default TaeKim;',
+      parserOptions,
+      errors: [{
+        message: getMessage('TaeKim'),
+        type: 'Identifier',
+      }],
+      settings: {
+        'import/extensions': ['.ts'],
+      },
+    },
+    {
+      filename: 'NotTaeKim.tsx',
+      code: 'export default TaeKim;',
+      output: 'export default TaeKim;',
+      parserOptions,
+      errors: [{
+        message: getMessage('TaeKim'),
+        type: 'Identifier',
+      }],
+      settings: {
+        'import/extensions': ['.tsx'],
+      },
     },
   ],
 })
