@@ -52,6 +52,7 @@ ruleTester.run('default-import-match-filename', rule, {
     'import loud_cat from "./loud-cat"',
     'import loudcat from "./loud_cat"',
     'import loud_cat from "./loud_cat"',
+    'import loudCat from "./loud_cat"',
     'import catModel from "./cat.model"',
     'import catModel from "./cat.model.js"',
     'import doge from "cat"',
