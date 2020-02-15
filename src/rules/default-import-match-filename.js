@@ -1,7 +1,6 @@
 import docsUrl from '../docsUrl'
 import isStaticRequire from '../core/staticRequire'
 import Path from 'path'
-import fs from 'fs'
 
 /**
  * @param {string} filename
@@ -64,9 +63,7 @@ function isAncestorRelativePath(path) {
  */
 function getPackageJsonName(packageJsonPath) {
   try {
-    const packageJsonContent = String(fs.readFileSync(packageJsonPath))
-    const packageJson = JSON.parse(packageJsonContent)
-    return packageJson.name || undefined
+    return require(packageJsonPath).name || undefined
   } catch (_) {
     return undefined
   }
