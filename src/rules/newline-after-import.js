@@ -58,12 +58,20 @@ module.exports = {
             'type': 'integer',
             'minimum': 1,
           },
+          'exact': {
+            'type': 'boolean',
+          },
         },
         'additionalProperties': false,
       },
     ],
   },
   create: function (context) {
+    const options = (function getOptions() {
+      const {count = 1, exact = false} = context.options[0] || {}
+      return {count, exact}
+    })()
+
     let level = 0
     const requireCalls = []
 
@@ -72,11 +80,13 @@ module.exports = {
         nextNode = nextNode.decorators[0]
       }
 
-      const options = context.options[0] || { count: 1 }
       const lineDifference = getLineDifference(node, nextNode)
       const EXPECTED_LINE_DIFFERENCE = options.count + 1
 
-      if (lineDifference < EXPECTED_LINE_DIFFERENCE) {
+      if (
+        lineDifference < EXPECTED_LINE_DIFFERENCE ||
+        lineDifference !== EXPECTED_LINE_DIFFERENCE && options.exact 
+      ) {
         let column = node.loc.start.column
 
         if (node.loc.start.line !== node.loc.end.line) {
@@ -90,10 +100,27 @@ module.exports = {
           },
           message: `Expected ${options.count} empty line${options.count > 1 ? 's' : ''} \
 after ${type} statement not followed by another ${type}.`,
-          fix: fixer => fixer.insertTextAfter(
-            node,
-            '\n'.repeat(EXPECTED_LINE_DIFFERENCE - lineDifference)
-          ),
+          fix(fixer) {
+            if (lineDifference < EXPECTED_LINE_DIFFERENCE) {
+              return fixer.insertTextAfter(
+                node,
+                '\n'.repeat(EXPECTED_LINE_DIFFERENCE - lineDifference)
+              )
+            } else {
+              const start = node.range[1]
+              const end = context.getSourceCode().getIndexFromLoc({
+                line: node.loc.end.line + (lineDifference - EXPECTED_LINE_DIFFERENCE),
+                column: 0
+              })
+
+              // Avoid removing non-empty lines.
+              if (/[^ \r\t\n]/.test(context.getSourceCode().getText().slice(start, end))) {
+                return undefined
+              }
+
+              return fixer.removeRange([start, end])
+            }
+          },
         })
       }
     }

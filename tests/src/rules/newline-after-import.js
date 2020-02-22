@@ -165,6 +165,28 @@ ruleTester.run('newline-after-import', require('rules/newline-after-import'), {
       parserOptions: { ecmaVersion: 2015, sourceType: 'module' },
       parser: require.resolve('babel-eslint'),
     },
+    {
+      code: `import foo from 'foo';\n\nbar();`,
+      options: [{ exact: true }],
+      parserOptions: { ecmaVersion: 2015, sourceType: 'module' },
+      parser: require.resolve('babel-eslint'),
+    },
+    {
+      code: `
+        import foo from 'foo';
+        
+        // comment
+        bar();`,
+      options: [{ exact: true, count: 1 }],
+      parserOptions: { ecmaVersion: 2015, sourceType: 'module' },
+      parser: require.resolve('babel-eslint'),
+    },
+    {
+      code: `import foo from 'foo';\n\n\nbar();`,
+      options: [{ exact: true, count: 2 }],
+      parserOptions: { ecmaVersion: 2015, sourceType: 'module' },
+      parser: require.resolve('babel-eslint'),
+    },
   ],
 
   invalid: [
@@ -337,6 +359,53 @@ ruleTester.run('newline-after-import', require('rules/newline-after-import'), {
         column: 1,
         message: REQUIRE_ERROR_MESSAGE,
       } ],
+      parserOptions: { ecmaVersion: 2015, sourceType: 'module' },
+      parser: require.resolve('babel-eslint'),
+    },
+    {
+      code: `
+import foo from 'foo';
+
+
+export default foo;
+`,
+      output: `
+import foo from 'foo';
+
+export default foo;
+`,
+      errors: [{
+        line: 2,
+        column: 1,
+        message: IMPORT_ERROR_MESSAGE,
+      } ],
+      options: [
+        { exact: true },
+      ],
+      parserOptions: { ecmaVersion: 2015, sourceType: 'module' },
+      parser: require.resolve('babel-eslint'),
+    },
+    {
+      code: `
+import foo from 'foo';
+
+// comment
+export default foo;
+`,
+      output: `
+import foo from 'foo';
+
+// comment
+export default foo;
+`,
+      errors: [{
+        line: 2,
+        column: 1,
+        message: IMPORT_ERROR_MESSAGE,
+      } ],
+      options: [
+        { exact: true },
+      ],
       parserOptions: { ecmaVersion: 2015, sourceType: 'module' },
       parser: require.resolve('babel-eslint'),
     },
